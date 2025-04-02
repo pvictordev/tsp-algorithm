@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
 
-const NUM_CITIES = 20;
-const POPULATION_SIZE = 100;
-const MUTATION_RATE = 0.1;
-const GENERATIONS = 100;
+const NUM_CITIES = 20; // The predefined number of cities
+const POPULATION_SIZE = 100; // The number of routes in the initial population
+const MUTATION_RATE = 0.1; // The probability of a route undergoing mutation
+const GENERATIONS = 100; // The number of generations the algorithm will run
 
 // Generate random cities
 const cities = Array.from({ length: NUM_CITIES }, () => ({
@@ -13,18 +13,23 @@ const cities = Array.from({ length: NUM_CITIES }, () => ({
 }));
 
 // Calculate distance between two cities
+// We use the Euclidean distance formula to calculate the distance between two cities.
 const distance = (a, b) => Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
 
 // Compute total route distance
+// 1. Go through the list of cities in a route and calculate the total distance.
+// 2. Add the distance between the last and first city to form a closed circuit.
 const routeDistance = (route) => {
   let dist = 0;
   for (let i = 0; i < route.length - 1; i++) {
     dist += distance(route[i], route[i + 1]);
   }
+  // Add the distance between the last city and the first city to form a closed circuit.
   return dist + distance(route[route.length - 1], route[0]);
 };
 
 // Create initial population
+// Each route is a random permutation of the city list.
 const createPopulation = () =>
   Array.from({ length: POPULATION_SIZE }, () =>
     [...cities].sort(() => Math.random() - 0.5)
@@ -49,6 +54,7 @@ const crossover = (parent1, parent2) => {
 };
 
 // Mutation - swap mutation
+// With a probability of 10%, two cities switch positions. This introduces variation to prevent premature convergence.
 const mutate = (route) => {
   if (Math.random() < MUTATION_RATE) {
     const i = Math.floor(Math.random() * route.length);
@@ -58,7 +64,6 @@ const mutate = (route) => {
   return route;
 };
 
-// Genetic Algorithm Execution
 const runGeneticAlgorithm = () => {
   let population = createPopulation();
   for (let i = 0; i < GENERATIONS; i++) {
